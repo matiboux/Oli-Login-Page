@@ -98,6 +98,10 @@ else if($_Oli->issetPostVars()) {
 				$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
 				$message .= '<a href="' . $_Oli::OLI_URL . '">Powered by Oli</a>';
 				
+				$headers = 'From: noreply@' . $this->getUrlParam('domain') . "\r\n";
+				$headers .= 'MIME-Version: 1.0' . "\r\n";
+				$headers .= 'Content-type: text/html; charset=iso-8859-1';
+				
 				if($mailStatus = mail($_Oli->getPostVars('email'), 'Change your password', utf8_decode($message), $headers)) {
 					$hideRecoverUI = true;
 					$resultCode = 'S:The request has been successfully created and a mail has been sent to you';
@@ -119,7 +123,8 @@ else if($_Oli->issetPostVars()) {
 				else if($_Oli->isProhibitedUsername($username)) $resultCode = 'E:You can\'t take this username';
 				else if($_Oli->isExistAccountInfos('ACCOUNTS', $_Oli->getPostVars('username'), false)) $resultCode = 'E:This account already exists!';
 				else {
-					if($_Oli->getRegisterVerificationStatus) {
+					if($_Oli->getRegisterVerificationStatus()) {
+						$subject = 'Your account have been created';
 						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
 						$message .= '<b>One more step!</b> <br />';
 						$message .= 'You just need to activate your account! Visit <a href="' . $_Oli->getShortcutLink('login') . 'login/activate/' . $activateKey . '">this page to activate it</a> (' . $_Oli->getShortcutLink('login') . 'login/activate/' . $activateKey . ') <br />';
@@ -129,8 +134,7 @@ else if($_Oli->issetPostVars()) {
 						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
 					}
 					else {
-						
-						
+						$subject = 'Your account have been created';
 						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
 						$message .= '<b>Yay! Your account have been successfully created</b> <br />';
 						$message .= 'You can <a href="' . $_Oli->getShortcutLink('login') . 'login/' . $activateKey . '">connect to it on this page</a> (' . $_Oli->getShortcutLink('login') . 'login/' . $activateKey . ') <br />';
@@ -140,7 +144,11 @@ else if($_Oli->issetPostVars()) {
 						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
 					}
 					
-					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email'))))) {
+					$headers = 'From: noreply@' . $this->getUrlParam('domain') . "\r\n";
+					$headers .= 'MIME-Version: 1.0' . "\r\n";
+					$headers .= 'Content-type: text/html; charset=iso-8859-1';
+					
+					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email')))), $subject, $message, $headers) {
 						if($_Oli->getRegisterVerificationStatus()) $resultCode = 'S:One more thing! A mail has been sent to you to activate your account';
 						else $resultCode = 'S:Your account has been successfully created';
 					}
