@@ -148,7 +148,7 @@ else if($_Oli->issetPostVars()) {
 					$headers .= 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1';
 					
-					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email')))), $subject, $message, $headers) {
+					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email'))), $subject, $message, $headers)) {
 						if($_Oli->getRegisterVerificationStatus()) $resultCode = 'S:One more thing! A mail has been sent to you to activate your account';
 						else $resultCode = 'S:Your account has been successfully created';
 					}
