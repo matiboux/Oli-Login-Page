@@ -44,8 +44,8 @@
 if(!$_Oli->getAccountsManagementStatus()) header('Location: ' . $_Oli->getUrlParam(0));
 
 if($_Oli->getUrlParam(2) == 'logout') {
-	if($_Oli->logoutAccount()) $resultCode = 'S:You have been disconnected';
-	else if($_Oli->isExistAuthKey()) $resultCode = 'S:You tried to disconnect but you\'re not connected';
+	if(!$_Oli->isExistAuthKey()) $resultCode = 'S:You tried to logout but you\'re not connected';
+	else if($_Oli->logoutAccount()) $resultCode = 'S:You have been disconnected';
 	else $resultCode = 'E:An error occurred while disconnecting you';
 }
 else if($_Oli->getUserRightLevel() >= $_Oli->translateUserRight('USER')) header('Location: ' . $_Oli->getUrlParam(0));
