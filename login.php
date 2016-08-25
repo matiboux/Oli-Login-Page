@@ -44,8 +44,8 @@
 if(!$_Oli->getAccountsManagementStatus()) header('Location: ' . $_Oli->getUrlParam(0));
 
 if($_Oli->getUrlParam(2) == 'logout') {
-	$_Oli->logoutAccount();
-	$resultCode = 'S:You have been disconnected';
+	if($_Oli->logoutAccount()) $resultCode = 'S:You have been disconnected';
+	else if($_Oli->isExistAuthKey()) $resultCode = 'S:You tried to disconnect but you\'re not connected';
 }
 else if($_Oli->getUserRightLevel() >= $_Oli->translateUserRight('USER')) header('Location: ' . $_Oli->getUrlParam(0));
 else if($_Oli->getUrlParam(2) == 'activate' AND !empty($_Oli->getUrlParam(3))) {
@@ -92,14 +92,10 @@ else if($_Oli->issetPostVars()) {
 				$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
 				$message .= '<b>One more step!</b> <br />';
 				$message .= 'You still want to change your password? Just <a href="' . $_Oli->getShortcutLink('login') . '/change-password/' . $activateKey . '">go there to change it</a> (' . $_Oli->getShortcutLink('login') . '/change-password/' . $activateKey . ') <br />';
-				$message .= 'You have ' . $expireDelay = ($_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
+				$message .= 'You have ' . ($expireDelay = $_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
 				$message .= 'If you don\'t want to change it, please cancel the request in your account settings (or just ignore this mail) <br /> <br />';
 				$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
 				$message .= '<a href="' . $_Oli::OLI_URL . '">Powered by Oli</a>';
-				
-				$headers = 'From: noreply@' . $_Oli->getSetting('domain') . "\r\n";
-				$headers .= 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1';
 				
 				if($mailStatus = mail($_Oli->getPostVars('email'), 'Change your password', utf8_decode($message), $headers)) {
 					$hideRecoverUI = true;
@@ -121,10 +117,33 @@ else if($_Oli->issetPostVars()) {
 				if($_Oli->isEmptyPostVars('email')) $resultCode = 'E:You did not enter your email';
 				else if($_Oli->isProhibitedUsername($username)) $resultCode = 'E:You can\'t take this username';
 				else if($_Oli->isExistAccountInfos('ACCOUNTS', $_Oli->getPostVars('username'), false)) $resultCode = 'E:This account already exists!';
-				else if(!$_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email'))))) $resultCode = 'E:An error occurred while creating your account';
 				else {
-					if($_Oli->getRegisterVerificationStatus()) $resultCode = 'S:One more thing! A mail has been sent to you to activate your account';
-					else $resultCode = 'S:Your account has been successfully created';
+					if($_Oli->getRegisterVerificationStatus) {
+						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
+						$message .= '<b>One more step!</b> <br />';
+						$message .= 'You just need to activate your account! Visit <a href="' . $_Oli->getShortcutLink('login') . 'login/activate/' . $activateKey . '">this page to activate it</a> (' . $_Oli->getShortcutLink('login') . 'login/activate/' . $activateKey . ') <br />';
+						$message .= 'You have ' . ($_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
+						$message .= 'If you don\'t activate your account, it will be suspended after this delay (then deleted if someone register with the same username) <br /> <br />';
+						$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
+						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
+					}
+					else {
+						
+						
+						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
+						$message .= '<b>Yay! Your account have been successfully created</b> <br />';
+						$message .= 'You can <a href="' . $_Oli->getShortcutLink('login') . 'login/' . $activateKey . '">connect to it on this page</a> (' . $_Oli->getShortcutLink('login') . 'login/' . $activateKey . ') <br />';
+						$message .= 'You have ' . ($expireDelay = $_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
+						$message .= 'If you don\'t activate your account, it will be suspended after this delay (then deleted if someone register with the same username) <br /> <br />';
+						$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
+						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
+					}
+					
+					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), strtolower(trim($_Oli->getPostVars('email'))))) {
+						if($_Oli->getRegisterVerificationStatus()) $resultCode = 'S:One more thing! A mail has been sent to you to activate your account';
+						else $resultCode = 'S:Your account has been successfully created';
+					}
+					else $resultCode = 'E:An error occurred while creating your account';
 				}
 			}
 			else {
@@ -153,7 +172,7 @@ else if($_Oli->issetPostVars()) {
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Login Page for Oli (<?php echo $_Oli::OLI_URL; ?>)" />
+<meta name="description" content="Login Page for Oli (<?php echo $_Oli->getOliInfos('website_url'); ?>)" />
 <meta name="keywords" content="Login,page,Oli,PHP,Framework,Mathieu,Guérin,Mati,Matiboux" />
 <meta name="author" content="Mathieu Guérin, matiboux@gmail.com" />
 
