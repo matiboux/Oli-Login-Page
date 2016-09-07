@@ -202,7 +202,7 @@ else if($_Oli->issetPostVars()) {
 
 <?php if(isset($resultCode)) { ?>
 	<?php
-	list($prefix, $message) = explode(':', $resultCode);
+	list($prefix, $message) = explode(':', $resultCode, 2);
 	if($prefix == 'E') $type = 'message-error';
 	?>
 	
