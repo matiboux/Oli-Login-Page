@@ -248,7 +248,7 @@ else if($_Oli->issetPostVars()) {
 				
 				<input type="text" name="username" value="<?php echo $_Oli->getPostVars('username'); ?>" placeholder="Username" />
 				<input type="password" name="password" value="<?php echo $_Oli->getPostVars('password'); ?>" placeholder="Password" />
-				<div class="checkbox"><label><input type="checkbox" name="rememberMe" <?php if(!$_Oli->issetPostVars('rememberMe') OR $_Oli->getPostVars('rememberMe')) { ?>checked<?php } ?> /> "Run clever boy, and remember me"</label></div>
+				<div class="checkbox"><label><input type="checkbox" name="rememberMe" <?php if(!$_Oli->issetPostVars('rememberMe') OR $_Oli->getPostVars('rememberMe')) { ?>checked<?php } ?> /> « Run clever boy, and remember me »</label></div>
 				<button type="submit">Login</button>
 			</form>
 		</div>
