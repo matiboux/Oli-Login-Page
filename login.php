@@ -2,7 +2,7 @@
 /*\
 |*|  ----------------------------
 |*|  --- [  Oli Login page  ] ---
-|*|  --- [ version 17.02-01 ] ---
+|*|  --- [ version 17.02-02 ] ---
 |*|  ----------------------------
 |*|  
 |*|  The official Oli login page
@@ -18,16 +18,11 @@
 |*|  
 |*|  --- --- ---
 |*|  
-|*|  Changelog for v17.02-01:
-|*|  - Added a versionning system.
-|*|  - Reviewed the entire source code.
-|*|  - Added few comments in the source code.
-|*|  - Added a tempory configuration for the register system – until the feature is added to Oli.
-|*|  - Allowed logged users to complete a change-password request.
-|*|    After completing it, the user – if logged in – is forced to logout.
-|*|  - Allowed both the use of username or email for login.
-|*|    « I thought it was already an existing feature tho.. » -Mati
-|*|  - Allowed users to complete a change-password request by entering manually a request activation code.
+|*|  Changelog for v17.02-02:
+|*|  - Fixed logout collisions with the login system.
+|*|  - Updated stuff in the login process:
+|*|    - The process is now case insensitive.
+|*|    - The process now supports use of emails as the "username"!
 |*|  
 |*|  Stuff to do next:
 |*|  - Rewrite the mails messages.
@@ -73,12 +68,7 @@ $mailHeaders = 'From: Noreply ' . $_Oli->getSetting('name') . ' <noreply@' . $_O
 $mailHeaders .= 'MIME-Version: 1.0' . "\r\n";
 $mailHeaders .= 'Content-type: text/html; charset=utf-8' . "\r\n";
 
-if($_Oli->getUrlParam(2) == 'logout') {
-	if(!$_Oli->verifyAuthKey()) $resultCode = 'S:You tried to logout but you\'re not connected';
-	else if($_Oli->logoutAccount()) $resultCode = 'S:You have been successfully disconnected';
-	else $resultCode = 'E:An error occurred while disconnecting you';
-}
-else if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
+if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
 	if($_Oli->isEmptyPostVars('newPassword')) $resultCode = 'E:Please enter the new password you want to set';
 	else if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getPostVars('activateKey')))) $resultCode = 'E:Sorry, the request you asked for does not exist';
 	else if($requestInfos['action'] != 'change-password') $resultCode = 'E:The request you triggered does not allow you to change your password';
@@ -95,7 +85,13 @@ else if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AN
 		else $resultCode = 'S:An error occurred while changing your password';
 	}
 }
-else if($_Oli->verifyAuthKey()) header('Location: ' . $_Oli->getUrlParam(0));
+else if($_Oli->verifyAuthKey()) {
+	if($_Oli->getUrlParam(2) == 'logout') {
+		if($_Oli->logoutAccount()) $resultCode = 'S:You have been successfully disconnected';
+		else $resultCode = 'E:An error occurred while disconnecting you';
+	}
+	else header('Location: ' . $_Oli->getUrlParam(0));	
+}
 /** At this point, the user cannot be logged in */
 else if($_Oli->getUrlParam(2) == 'activate' AND !empty($_Oli->getUrlParam(3))) {
 	if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getUrlParam(3)))) $resultCode = 'E:Sorry, the request you asked for does not exist';
@@ -180,10 +176,12 @@ Also  , if possible, please take time to cancel the request from your account se
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter your username or your email';
 		else {
 			$username = trim($_Oli->getPostVars('username'));
-			if(!$_Oli->isExistAccountInfos('ACCOUNTS', $username, false) AND !$_Oli->isExistAccountInfos('ACCOUNTS', array('email' =>$username), false)) $resultCode = 'E:Sorry, no account is associated with the username or email you entered';
-			else if($_Oli->getUserRightLevel($username) == $_Oli->translateUserRight('NEW-USER')) $resultCode = 'E:Sorry, the account associated with that username or email is not yet activated';
-			else if($_Oli->getUserRightLevel($username) == $_Oli->translateUserRight('BANNED')) $resultCode = 'E:Sorry, the account associated with that username or email is banned and is not allowed to log in';
-			else if($_Oli->getUserRightLevel($username) < $_Oli->translateUserRight('USER')) $resultCode = 'E:Sorry, the account associated with that username or email is not allowed to log in';
+			$isExistByUsername = $_Oli->isExistAccountInfos('ACCOUNTS', $username, false);
+			$isExistByEmail = $_Oli->isExistAccountInfos('ACCOUNTS', array('email' => $username), false);
+			if(!$isExistByUsername AND !$isExistByEmail) $resultCode = 'E:Sorry, no account is associated with the username or email you entered';
+			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) == $_Oli->translateUserRight('NEW-USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) == $_Oli->translateUserRight('NEW-USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not yet activated';
+			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) == $_Oli->translateUserRight('BANNED')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) == $_Oli->translateUserRight('BANNED'))) $resultCode = 'E:Sorry, the account associated with that username or email is banned and is not allowed to log in';
+			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) < $_Oli->translateUserRight('USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) < $_Oli->translateUserRight('USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not allowed to log in';
 			else if($_Oli->isEmptyPostVars('password')) $resultCode = 'E:Please enter your password';
 			else if($_Oli->verifyLogin($username, $_Oli->getPostVars('password'))) {
 				$loginDuration = $_Oli->getPostVars('rememberMe') ? 15*24*3600 : 24*3600; // 15 days : 1 day
@@ -195,6 +193,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			}
 			else $resultCode = 'E:Sorry, the password you entered seems to be wrong';
 		}
+		var_dump($_Oli->getUserRightLevel(array('email' => $username), false));
 	}
 }
 ?>
