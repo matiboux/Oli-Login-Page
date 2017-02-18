@@ -2,7 +2,7 @@
 /*\
 |*|  ----------------------------
 |*|  --- [  Oli Login page  ] ---
-|*|  --- [ version 17.02-02 ] ---
+|*|  --- [ version 17.02-03 ] ---
 |*|  ----------------------------
 |*|  
 |*|  The official Oli login page
@@ -18,11 +18,8 @@
 |*|  
 |*|  --- --- ---
 |*|  
-|*|  Changelog for v17.02-02:
-|*|  - Fixed logout collisions with the login system.
-|*|  - Updated stuff in the login process:
-|*|    - The process is now case insensitive.
-|*|    - The process now supports use of emails as the "username"!
+|*|  Changelog for v17.02-03:
+|*|  - Updated input placeholders
 |*|  
 |*|  Stuff to do next:
 |*|  - Rewrite the mails messages.
@@ -245,7 +242,7 @@ Also  , if possible, please take time to cancel the request from your account se
 		<div class="form">
 			<h2>Recover your account</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/recover')?>" method="post">
-				<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email Address" />
+				<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email address" />
 				<button type="submit">Recover</button>
 			</form>
 		</div>
@@ -254,8 +251,8 @@ Also  , if possible, please take time to cancel the request from your account se
 		<div class="form">
 			<h2>Change your pasword</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/change-password')?><?php if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')))) { ?>&activateKey=<?=urlencode($_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))?><?php } ?>" method="post">
-				<?php if($requestInfos) { ?><input type="text" name="username" value="<?=$requestInfos['username']?>" disabled /><?php } ?>
-				<input type="text" name="activateKey" value="<?=$_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')?>" <?php if($requestInfos) { ?>disabled<?php } ?> />
+				<?php if($requestInfos) { ?><input type="text" name="username" value="<?=$requestInfos['username']?>" placeholder="Username" disabled /><?php } ?>
+				<input type="text" name="activateKey" value="<?=$_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')?>" placeholder="Activation key" <?php if($requestInfos) { ?>disabled<?php } ?> />
 				<input type="password" name="newPassword" value="<?=$_Oli->getPostVars('newPassword')?>" placeholder="New password" />
 				<button type="submit">Update</button>
 			</form>
@@ -287,7 +284,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/register')?>" method="post">
 					<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
 					<input type="password" name="password" value="<?=$_Oli->getPostVars('password')?>" placeholder="Password" />
-					<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email Address" />
+					<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email address" />
 					<button type="submit">Register</button>
 				</form>
 			</div>
