@@ -4,10 +4,10 @@
 |*|  --- [  Oli Login page  ] ---
 |*|  --- [ version 17.02-04 ] ---
 |*|  ----------------------------
+|*|  Built for Oli Beta 1.7.1 (development branch)
 |*|  
-|*|  The official Oli login page
-|*|  
-|*|  Created and developed by Mathieu Guérin, aka Matiboux, for Oli, an open source PHP Framework.
+|*|  The official login page for Oli, an open source PHP Framework made by Matiboux.
+|*|  Created and developed by Mathieu Guérin – aka Matiboux.
 |*|  
 |*|  Oli Login page Github Gist: https://gist.github.com/matiboux/38f1057947c26b8ccf234da8b47e20b3/
 |*|  Original CSS template by Andy Tran (http://codepen.io/andytran/pen/PwoQgO)
@@ -34,7 +34,7 @@
 |*|  
 |*|  MIT License
 |*|  
-|*|  Copyright (c) 2015 Mathieu Guérin (aka Matiboux)
+|*|  Copyright (c) 2015-2017 Mathieu Guérin (aka Matiboux)
 |*|  
 |*|    Permission is hereby granted, free of charge, to any person obtaining a copy
 |*|    of this software and associated documentation files (the "Software"), to deal
