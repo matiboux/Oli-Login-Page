@@ -2,7 +2,7 @@
 /*\
 |*|  ----------------------------
 |*|  --- [  Oli Login page  ] ---
-|*|  --- [ version 17.02-05 ] ---
+|*|  --- [ version 17.02-06 ] ---
 |*|  ----------------------------
 |*|  Built for Oli Beta 1.7.1 (development branch)
 |*|  
@@ -18,16 +18,18 @@
 |*|  
 |*|  --- --- ---
 |*|  
-|*|  Changelog for v17.02-05:
-|*|  - Replaced a $this var by a $_Oli var. Copy/paste thing. I forgot. Lol.
+|*|  Changelog for v17.02-06:
+|*|  - Added temporary config for login duration.
 |*|  
 |*|  Stuff to do next:
 |*|  - Rewrite the mails messages.
-|*|  - Add config for disabling login management feature (such as register).
 |*|  - Ban both IP and browser (coookie) of users who fails login too many times to prevent from brute-force attacks.
-|*|    - Add config for that (Oli).
-|*|  - Add config for login duration.
 |*|  - Allow direct switch between the recover and the change-password form, the same way as the login/register switch.
+|*|  
+|*|  Stuff to do on Oli:
+|*|  - Add config for disabling login management feature (such as register).
+|*|  - Add support and config for login limits.
+|*|  - Add config for login duration.
 |*|  
 |*|  --- --- ---
 |*|  
@@ -54,9 +56,11 @@
 |*|    SOFTWARE.
 \*/
 
-/** TEMPORARY CONFIG – as some features is now yet added to Oli */
+/** TEMPORARY CONFIG – as some features are now yet added to Oli */
 $config = array(
 	'allow_register' => true,
+	'default_session_duration' => 24*3600, // 1 day
+	'extended_session_duration' => 15*24*3600, // 15 days
 	'fontAwesome' => array(
 		'useCDN' => false,
 		'styleCdnPath' => 'css/font-awesome.min.css', // useCDN = true
@@ -187,7 +191,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) < $_Oli->translateUserRight('USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) < $_Oli->translateUserRight('USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not allowed to log in';
 			else if($_Oli->isEmptyPostVars('password')) $resultCode = 'E:Please enter your password';
 			else if($_Oli->verifyLogin($username, $_Oli->getPostVars('password'))) {
-				$loginDuration = $_Oli->getPostVars('rememberMe') ? 15*24*3600 : 24*3600; // 15 days : 1 day
+				$loginDuration = $_Oli->getPostVars('rememberMe') ? $config['extended_session_duration'] : $config['default_session_duration'];
 				if($_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
 					if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
 					else header('Location: ' . $_Oli->getUrlParam(0));
