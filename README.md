@@ -9,7 +9,7 @@ Download the [latest *login.php*](https://github.com/OliFramework/Oli-Login-Page
 
 ### License
 
-Copyright (C) 2017 Matiboux  
+Copyright (C) 2017 Matiboux (Mathieu Guérin)  
 *You'll find a copy of the MIT license in the **LICENSE** file.*
 
 This license applies to files in this repository.
