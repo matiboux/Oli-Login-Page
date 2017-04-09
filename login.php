@@ -2,7 +2,7 @@
 /*\
 |*|  ----------------------------
 |*|  --- [  Oli Login page  ] ---
-|*|  --- [ version 17.03-02 ] ---
+|*|  --- [ version 17.04-01 ] ---
 |*|  ----------------------------
 |*|  Built for Oli Beta 1.8.0 (development branch)
 |*|  
@@ -18,8 +18,8 @@
 |*|  
 |*|  --- --- ---
 |*|  
-|*|  Changelog for v17.02-06:
-|*|  - Created its own Repository!
+|*|  Changelog for v17.04-01:
+|*|  - Added support for hashed request activation keys
 |*|  
 |*|  Stuff to do next:
 |*|  - Rewrite the mails messages.
@@ -60,7 +60,7 @@
 $config = array(
 	'allow_register' => true,
 	'default_session_duration' => 24*3600, // 1 day
-	'extended_session_duration' => 15*24*3600, // 15 days
+	'extended_session_duration' => 7*24*3600, // 15 days
 	'fontAwesome' => array(
 		'useCDN' => false,
 		'styleCdnPath' => 'css/font-awesome.min.css', // useCDN = true
@@ -77,7 +77,7 @@ $mailHeaders .= 'Content-type: text/html; charset=utf-8' . "\r\n";
 
 if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
 	if($_Oli->isEmptyPostVars('newPassword')) $resultCode = 'E:Please enter the new password you want to set';
-	else if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getPostVars('activateKey')))) $resultCode = 'E:Sorry, the request you asked for does not exist';
+	else if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) $resultCode = 'E:Sorry, the request you asked for does not exist';
 	else if($requestInfos['action'] != 'change-password') $resultCode = 'E:The request you triggered does not allow you to change your password';
 	else if(time() > strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, the request you triggered has expired';
 	else {
@@ -85,7 +85,7 @@ if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !em
 		if(!$_Oli->verifyAuthKey()) $_Oli->logoutAccount();
 		
 		/** Deletes all the user sessions, change the user password and deletes the request */
-		if($_Oli->deleteAccountLines('SESSIONS', $requestInfos['username']) AND $_Oli->updateAccountInfos('ACCOUNTS', array('password' => $_Oli->hashPassword($_Oli->getPostVars('newPassword'))), $requestInfos['username']) AND $_Oli->deleteAccountLines('REQUESTS', array('activate_key' => $_Oli->getPostVars('activateKey')))) {
+		if($_Oli->deleteAccountLines('SESSIONS', $requestInfos['username']) AND $_Oli->updateAccountInfos('ACCOUNTS', array('password' => $_Oli->hashPassword($_Oli->getPostVars('newPassword'))), $requestInfos['username']) AND $_Oli->deleteAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) {
 			$hideChangePasswordUI = true;
 			$resultCode = 'S:Your password has been successfully changed!';
 		}
@@ -101,10 +101,10 @@ else if($_Oli->verifyAuthKey()) {
 }
 /** At this point, the user cannot be logged in */
 else if($_Oli->getUrlParam(2) == 'activate' AND !empty($_Oli->getUrlParam(3))) {
-	if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getUrlParam(3)))) $resultCode = 'E:Sorry, the request you asked for does not exist';
+	if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3))))) $resultCode = 'E:Sorry, the request you asked for does not exist';
 	else if($requestInfos['action'] != 'activate') $resultCode = 'E:The request you triggered does not allow you to activate any account';
 	else if(time() > strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, the request you triggered has expired';
-	else if($_Oli->deleteAccountLines('REQUESTS', array('activate_key' => $_Oli->getUrlParam(3))) AND $_Oli->updateUserRight('USER', $requestInfos['username'])) $resultCode = 'S:Your account has been successfully activated!';
+	else if($_Oli->deleteAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3)))) AND $_Oli->updateUserRight('USER', $requestInfos['username'])) $resultCode = 'S:Your account has been successfully activated!';
 	else $resultCode = 'E:An error occurred while activating your account';
 }
 else if($_Oli->issetPostVars()) {
@@ -258,7 +258,7 @@ else $_Oli->loadCdnStyle($config['fontAwesome']['styleAbsUrl'], true); ?>
 	<?php } else if($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI) { ?>
 		<div class="form">
 			<h2>Change your pasword</h2>
-			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/change-password')?><?php if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => $_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')))) { ?>&activateKey=<?=urlencode($_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))?><?php } ?>" method="post">
+			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/change-password')?><?php if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))))) { ?>&activateKey=<?=urlencode($_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))?><?php } ?>" method="post">
 				<?php if($requestInfos) { ?><input type="text" name="username" value="<?=$requestInfos['username']?>" placeholder="Username" disabled /><?php } ?>
 				<input type="text" name="activateKey" value="<?=$_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')?>" placeholder="Activation key" <?php if($requestInfos) { ?>disabled<?php } ?> />
 				<input type="password" name="newPassword" value="<?=$_Oli->getPostVars('newPassword')?>" placeholder="New password" />
