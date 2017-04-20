@@ -2,9 +2,8 @@
 /*\
 |*|  ----------------------------
 |*|  --- [  Oli Login page  ] ---
-|*|  --- [ version 17.04-01 ] ---
 |*|  ----------------------------
-|*|  Built for Oli Beta 1.8.0 (development branch)
+|*|  Developed for Oli Beta 1.8.0 (development branch)
 |*|  
 |*|  The official login page for Oli, an open source PHP Framework made by Matiboux.
 |*|  Created and developed by Mathieu Guérin – aka Matiboux.
@@ -18,12 +17,10 @@
 |*|  
 |*|  --- --- ---
 |*|  
-|*|  Changelog for v17.04-01:
-|*|  - Added support for hashed request activation keys
+|*|  Changelog: refer to repository commits
 |*|  
 |*|  Stuff to do next:
-|*|  - Rewrite the mails messages.
-|*|  - Ban both IP and browser (coookie) of users who fails login too many times to prevent from brute-force attacks.
+|*|  - Ban both IP and browser (cookie) of users who fails login too many times to prevent brute-force attacks.
 |*|  - Allow direct switch between the recover and the change-password form, the same way as the login/register switch.
 |*|  
 |*|  Stuff to do on Oli:
@@ -58,11 +55,8 @@
 
 /** TEMPORARY CONFIG – as some features are now yet added to Oli */
 $config = array(
-	'allow_register' => true,
-	'default_session_duration' => 24*3600, // 1 day
-	'extended_session_duration' => 7*24*3600, // 15 days
 	'fontAwesome' => array(
-		'useCDN' => false,
+		'useCDN' => true,
 		'styleCdnPath' => 'css/font-awesome.min.css', // useCDN = true
 		'styleAbsUrl' => 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' // useCDN = false
 ));
@@ -137,7 +131,7 @@ Also  , if possible, please take time to cancel the request from your account se
 		}
 		else $resultCode = 'E:An error occurred while creating the change-password request';
 	}
-	else if($config['allow_register'] AND $_Oli->issetPostVars('email')) {
+	else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter an username';
 		else {
 			$username = trim($_Oli->getPostVars('username'));
@@ -191,7 +185,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) < $_Oli->translateUserRight('USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) < $_Oli->translateUserRight('USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not allowed to log in';
 			else if($_Oli->isEmptyPostVars('password')) $resultCode = 'E:Please enter your password';
 			else if($_Oli->verifyLogin($username, $_Oli->getPostVars('password'))) {
-				$loginDuration = $_Oli->getPostVars('rememberMe') ? $config['extended_session_duration'] : $config['default_session_duration'];
+				$loginDuration = $_Oli->getPostVars('rememberMe') ? $_Oli->config['extended_session_duration'] : $_Oli->config['default_session_duration'];
 				if($_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
 					if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
 					else header('Location: ' . $_Oli->getUrlParam(0));
@@ -267,13 +261,13 @@ else $_Oli->loadCdnStyle($config['fontAwesome']['styleAbsUrl'], true); ?>
 		</div>
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
 	<?php } else { ?>
-		<?php if($config['allow_register']) { ?>
+		<?php if($_Oli->config['allow_register']) { ?>
 			<div class="toggle"><i class="fa fa-times <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil<?php } ?>"></i>
 				<div class="tooltip"><?php if($_Oli->getUrlParam(2) != 'register') { ?>Register<?php } else { ?>Login<?php } ?></div>
 			</div>
 		<?php } ?>
 		
-		<div class="form" style="display:<?php if($_Oli->getUrlParam(2) == 'register' AND $config['allow_register']) { ?>none<?php } else { ?>block<?php } ?>">
+		<div class="form" style="display:<?php if($_Oli->getUrlParam(2) == 'register' AND $_Oli->config['allow_register']) { ?>none<?php } else { ?>block<?php } ?>">
 			<h2>Login to your account</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/')?>" method="post">
 				<?php if(!empty($_Oli->getPostVars('referer')) OR !empty($_SERVER['HTTP_REFERER'])) { ?>
@@ -286,7 +280,7 @@ else $_Oli->loadCdnStyle($config['fontAwesome']['styleAbsUrl'], true); ?>
 				<button type="submit">Login</button>
 			</form>
 		</div>
-		<?php if($config['allow_register']) { ?>
+		<?php if($_Oli->config['allow_register']) { ?>
 			<div class="form" style="display: <?php if($_Oli->getUrlParam(2) != 'register') { ?>none<?php } else { ?>block<?php } ?>;">
 				<h2>Create an account</h2>
 				<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/register')?>" method="post">
