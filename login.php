@@ -54,7 +54,7 @@
 \*/
 
 /** Login management is disabled by the current config */
-if(!$_Oli->getAccountsManagementStatus()) header('Location: ' . $_Oli->getUrlParam(0));
+if(!$_Oli->config['user_management'] OR !$_Oli->config['allow_login']) header('Location: ' . $_Oli->getUrlParam(0));
 
 $mailHeaders = 'From: Noreply ' . $_Oli->getSetting('name') . ' <noreply@' . $_Oli->getUrlParam('domain') . '>' . "\r\n";
 $mailHeaders .= 'MIME-Version: 1.0' . "\r\n";
@@ -135,7 +135,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				} else $resultCode = 'E:An error occurred while creating your account';
 			}
 		}
-	} else {
+	} else if($_Oli->config['allow_login']) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter your username or your email';
 		else {
 			$username = trim($_Oli->getPostVars('username'));
@@ -207,6 +207,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				<button type="submit">Recover</button>
 			</form>
 		</div>
+		
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
 	<?php } else if($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI) { ?>
 		<div class="form">
@@ -218,6 +219,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				<button type="submit">Update</button>
 			</form>
 		</div>
+		
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
 	<?php } else { ?>
 		<?php if($_Oli->config['allow_register']) { ?>
@@ -226,7 +228,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			</div>
 		<?php } ?>
 		
-		<div class="form" style="display:<?php if($_Oli->getUrlParam(2) == 'register' AND $_Oli->config['allow_register']) { ?>none<?php } else { ?>block<?php } ?>">
+		<div class="form" style="display:<?php if($_Oli->getUrlParam(2) != 'register' OR !$_Oli->config['allow_register']) { ?>block<?php } else { ?>none<?php } ?>">
 			<h2>Login to your account</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/')?>" method="post">
 				<?php if(!empty($_Oli->getPostVars('referer')) OR !empty($_SERVER['HTTP_REFERER'])) { ?>
@@ -240,7 +242,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			</form>
 		</div>
 		<?php if($_Oli->config['allow_register']) { ?>
-			<div class="form" style="display: <?php if($_Oli->getUrlParam(2) != 'register') { ?>none<?php } else { ?>block<?php } ?>;">
+			<div class="form" style="display: <?php if($_Oli->getUrlParam(2) == 'register') { ?>block<?php } else { ?>none<?php } ?>;">
 				<h2>Create an account</h2>
 				<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/register')?>" method="post">
 					<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
@@ -250,6 +252,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				</form>
 			</div>
 		<?php } ?>
+		
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/recover">Forgot your password?</a></div>
 	<?php } ?>
 </div>
