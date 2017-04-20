@@ -91,7 +91,7 @@ else if($_Oli->config['account_activation'] AND $_Oli->getUrlParam(2) == 'activa
 	else $resultCode = 'E:An error occurred while activating your account';
 }
 else if($_Oli->issetPostVars()) {
-	if($_Oli->getUrlParam(2) == 'recover') {
+	if($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover') {
 		if($_Oli->isEmptyPostVars('email')) $resultCode = 'E:Please enter your email';
 		else if(!$username = $_Oli->getAccountInfos('ACCOUNTS', 'username', array('email' => trim($_Oli->getPostVars('email'))), false)) $resultCode = 'E:Sorry, no account is associated with the email you entered';
 		else if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('username' => $username, 'action' => 'change-password')) AND time() <= strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, a change-password request already exists for that account, please check your mail inbox.';
@@ -195,7 +195,7 @@ Also  , if possible, please take time to cancel the request from your account se
 <div class="module form-module">
 	<?php /** Pre-edits for the recover/change-password switch */ ?>
 	<?php //if(($_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) OR ($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI)) { ?>
-	<?php if($_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) { ?>
+	<?php if($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) { ?>
 		<?php /*<div class="toggle"><i class="fa fa-times <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil<?php } ?>"></i>
 			<div class="tooltip"><?php if($_Oli->getUrlParam(2) != 'register') { ?>Register<?php } else { ?>Login<?php } ?></div>
 		</div>*/ ?>
@@ -253,7 +253,9 @@ Also  , if possible, please take time to cancel the request from your account se
 			</div>
 		<?php } ?>
 		
-		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/recover">Forgot your password?</a></div>
+		<?php if($_Oli->config['allow_recover']) { ?>
+			<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/recover">Forgot your password?</a></div>
+		<?php } ?>
 	<?php } ?>
 </div>
 
