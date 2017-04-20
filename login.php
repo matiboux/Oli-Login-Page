@@ -82,16 +82,14 @@ if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !em
 		if($_Oli->deleteAccountLines('SESSIONS', $requestInfos['username']) AND $_Oli->updateAccountInfos('ACCOUNTS', array('password' => $_Oli->hashPassword($_Oli->getPostVars('newPassword'))), $requestInfos['username']) AND $_Oli->deleteAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) {
 			$hideChangePasswordUI = true;
 			$resultCode = 'S:Your password has been successfully changed!';
-		}
-		else $resultCode = 'S:An error occurred while changing your password';
+		} else $resultCode = 'S:An error occurred while changing your password';
 	}
 }
 else if($_Oli->verifyAuthKey()) {
 	if($_Oli->getUrlParam(2) == 'logout') {
 		if($_Oli->logoutAccount()) $resultCode = 'S:You have been successfully disconnected';
 		else $resultCode = 'E:An error occurred while disconnecting you';
-	}
-	else header('Location: ' . $_Oli->getUrlParam(0));	
+	} else header('Location: ' . $_Oli->getUrlParam(0));	
 }
 /** At this point, the user cannot be logged in */
 else if($_Oli->getUrlParam(2) == 'activate' AND !empty($_Oli->getUrlParam(3))) {
@@ -123,13 +121,11 @@ Also  , if possible, please take time to cancel the request from your account se
 			if(mail($email, $subject, $message, $mailHeaders)) {
 				$hideRecoverUI = true;
 				$resultCode = 'S:The request has been successfully created and a mail has been sent to you';
-			}
-			else {
+			} else {
 				$_Oli->deleteAccountLines('REQUESTS', array('activate_key' => $activateKey));
 				$resultCode = 'D:An error occurred while sending the mail to you';
 			}
-		}
-		else $resultCode = 'E:An error occurred while creating the change-password request';
+		} else $resultCode = 'E:An error occurred while creating the change-password request';
 	}
 	else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter an username';
@@ -142,13 +138,10 @@ Also  , if possible, please take time to cancel the request from your account se
 			else {
 				$email = strtolower(trim($_Oli->getPostVars('email')));
 				if($_Oli->isExistAccountInfos('ACCOUNTS', array('email' => $email), false)) $resultCode = 'E:Sorry, the email you entered is already associated with an existing account';
-				else {
-					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), $email, array('headers' => $mailHeaders))) {
-						if($_Oli->config['account_activation']) $resultCode = 'S:Your account has been successfully created and a mail has been sent to you';
-						else $resultCode = 'S:Your account has been successfully created; you can now login to it';
-					}
-					else $resultCode = 'E:An error occurred while creating your account';
-				}
+				else if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), $email, array('headers' => $mailHeaders))) {
+					if($_Oli->config['account_activation']) $resultCode = 'S:Your account has been successfully created and a mail has been sent to you';
+					else $resultCode = 'S:Your account has been successfully created; you can now login to it';
+				} else $resultCode = 'E:An error occurred while creating your account';
 			}
 		}
 	} else {
@@ -167,10 +160,8 @@ Also  , if possible, please take time to cancel the request from your account se
 				if($_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
 					if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
 					else header('Location: ' . $_Oli->getUrlParam(0));
-				}
-				else $resultCode = 'E:An error occurred while logging you in';
-			}
-			else $resultCode = 'E:Sorry, the password you entered seems to be wrong';
+				} else $resultCode = 'E:An error occurred while logging you in';
+			} else $resultCode = 'E:Sorry, the password you entered seems to be wrong';
 		}
 	}
 }
