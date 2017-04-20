@@ -143,30 +143,8 @@ Also  , if possible, please take time to cancel the request from your account se
 				$email = strtolower(trim($_Oli->getPostVars('email')));
 				if($_Oli->isExistAccountInfos('ACCOUNTS', array('email' => $email), false)) $resultCode = 'E:Sorry, the email you entered is already associated with an existing account';
 				else {
-					$subject = 'Your account has been created';
-					if($_Oli->getRegisterVerificationStatus()) {
-						/** This message will need to be reviewed in a future release */
-						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
-						$message .= '<b>One more step!</b> <br />';
-						$message .= 'You just need to activate your account! Visit <a href="' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) .'/activate/' . $activateKey . '">this page to activate it</a> (' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) .'/activate/' . $activateKey . ') <br />';
-						$message .= 'You have ' . ($expireDelay = $_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
-						$message .= 'If you don\'t activate your account, it will be suspended after this delay (then deleted if someone register with the same username) <br /> <br />';
-						$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
-						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
-					}
-					else {
-						/** This message will need to be reviewed in a future release */
-						$message = '<b>Hey ' . $username . '</b>, <br /> <br />';
-						$message .= '<b>Yay! Your account has been successfully created</b> <br />';
-						$message .= 'You can <a href="' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) .'">connect to it on this page</a> (' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) .') <br />';
-						$message .= 'You have ' . ($expireDelay = $_Oli->getRequestsExpireDelay() /3600 /24) . ' ' . ($expireDelay > 1 ? 'days' : 'day') . ' to confirm the request <br /> <br />';
-						$message .= 'If you don\'t activate your account, it will be suspended after this delay (then deleted if someone register with the same username) <br /> <br />';
-						$message .= 'You got this mail from <a href="' . $_Oli->getUrlParam(0) . '">' . $_Oli->getSetting('name') . '</a> <br />';
-						$message .= '<a href="' . $_Oli->getOliInfos('website_url') . '">Powered by Oli</a>';
-					}
-					
-					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), $email, $subject, $message, $mailHeaders)) {
-						if($_Oli->getRegisterVerificationStatus()) $resultCode = 'S:Your account has been successfully created and a mail has been sent to you';
+					if($_Oli->registerAccount($username, $_Oli->getPostVars('password'), $email, array('headers' => $mailHeaders))) {
+						if($_Oli->config['account_activation']) $resultCode = 'S:Your account has been successfully created and a mail has been sent to you';
 						else $resultCode = 'S:Your account has been successfully created; you can now login to it';
 					}
 					else $resultCode = 'E:An error occurred while creating your account';
