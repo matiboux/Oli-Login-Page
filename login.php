@@ -21,7 +21,6 @@
 |*|  
 |*|  Stuff to do next:
 |*|  - Ban both IP and browser (cookie) of users who fails login too many times to prevent brute-force attacks.
-|*|  - Allow direct switch between the recover and the change-password form, the same way as the login/register switch.
 |*|  - Add captcha for registering.
 |*|  
 |*|  Stuff to do on Oli:
@@ -171,7 +170,7 @@ Also  , if possible, please take time to cancel the request from your account se
 <style>html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}table{border-collapse:collapse;border-spacing:0}</style>
 <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700" />
 <?php $_Oli->loadStyle('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', true); ?>
-<style>body{background:#e9e9e9;color:#666;font-family:'Roboto', sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.header{padding:50px 0;text-align:center;letter-spacing:2px}.header h1{margin:0 0 20px;font-size:40px;font-weight:400}@media(max-width: 420px){.header h1{font-size:32px;}}.header h1 a{color:#0084b4;font-weight:400;text-decoration:none}.header span{font-size:12px}@media(max-width: 420px){.header span{font-size:10px;}}.header span .fa{color:#0084b4}.header span a{color:#0084b4;font-weight:600;text-decoration:none}.message,.form-module{position:relative;background:#fff;max-width:320px;width:100%;margin:0 auto 30px;border-top:5px solid #0084b4;box-shadow:0 0 3px rgba(0, 0, 0, 0.1)}.message.message-error{border-top:5px solid #d9534f}.message .content{padding:20px 40px}.message h2{color:#555;font-size:16px;font-weight:400;line-height:1}.message b{font-weight:700}.form-module .toggle{cursor:pointer;position:absolute;top:-0;right:-0;background:#0084b4;width:30px;height:30px;margin:-5px 0 0;color:#fff;font-size:12px;line-height:30px;text-align:center}.form-module .toggle .tooltip{position:absolute;top:8px;right:40px;display:block;background:rgba(0, 0, 0, 0.6);width:auto;padding:5px;font-size:10px;line-height:1;text-transform:uppercase}.form-module .toggle .tooltip:before{content:'';position:absolute;top:5px;right:-5px;display:block;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:5px solid rgba(0, 0, 0, 0.6)}.form-module .form{display:none;padding:40px}.form-module .form:first-child,.form-module .form:nth-child(2){display:block}.form-module h2{margin:0 0 20px;color:#0084b4;font-size:18px;font-weight:400;line-height:1}.form-module input{outline:none;display:block;width:100%;border:1px solid #d9d9d9;margin:0 0 20px;padding:10px 15px;box-sizing:border-box;font-weight:400;-webkit-transition:.3s ease;transition:.3s ease}.form-module .checkbox{display:block;margin:0 0 20px;padding:0 10px;font-weight:300;-webkit-transition:.3s ease;transition:.3s ease}.form-module .checkbox > label{cursor:pointer}.form-module .checkbox > label > input[type=checkbox]{display:initial;width:auto;margin:0;margin-top:1px\9;line-height:normal}.form-module input:focus{border:1px solid #0084b4;color:#333}.form-module button{cursor:pointer;background:#0084b4;width:100%;border:0;padding:10px 15px;color:#fff;-webkit-transition:.3s ease;transition:.3s ease}.form-module button:hover{background:#178ab4}.form-module .cta{background:#f2f2f2;width:100%;padding:15px 40px;box-sizing:border-box;color:#666;font-size:12px;text-align:center}.form-module .cta a{color:#333;text-decoration:none}.footer{text-align:center;letter-spacing:2px}.footer span{font-size:12px}.footer span .fa{color:#0084b4}.footer span a{color:#0084b4;font-weight:600;text-decoration:none}</style>
+<style>body{background:#e9e9e9;color:#666;font-family:'Roboto', sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.header{padding:50px 0;text-align:center;letter-spacing:2px}.header h1{margin:0 0 20px;font-size:40px;font-weight:400}@media(max-width: 420px){.header h1{font-size:32px;}}.header h1 a{color:#0084b4;font-weight:400;text-decoration:none}.header span{font-size:12px}@media(max-width: 420px){.header span{font-size:10px;}}.header span .fa{color:#0084b4}.header span a{color:#0084b4;font-weight:600;text-decoration:none}.message,.form-module{position:relative;background:#fff;max-width:320px;width:100%;margin:0 auto 30px;border-top:5px solid #0084b4;box-shadow:0 0 3px rgba(0, 0, 0, 0.1)}.message.message-error{border-top:5px solid #d9534f}.message .content{padding:20px 40px}.message h2{color:#555;font-size:16px;font-weight:400;line-height:1}.message b{font-weight:700}.form-module .toggle{cursor:pointer;position:absolute;top:-0;right:-0;background:#0084b4;width:30px;height:30px;margin:-5px 0 0;color:#fff;font-size:12px;line-height:30px;text-align:center}.form-module .toggle .tooltip{position:absolute;top:8px;right:40px;display:block;background:rgba(0, 0, 0, 0.6);width:auto;padding:5px;font-size:10px;line-height:1;text-transform:uppercase;white-space:nowrap}.form-module .toggle .tooltip:before{content:'';position:absolute;top:5px;right:-5px;display:block;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:5px solid rgba(0, 0, 0, 0.6)}.form-module .form{display:none;padding:40px}.form-module .form:first-child,.form-module .form:nth-child(2){display:block}.form-module h2{margin:0 0 20px;color:#0084b4;font-size:18px;font-weight:400;line-height:1}.form-module input{outline:none;display:block;width:100%;border:1px solid #d9d9d9;margin:0 0 20px;padding:10px 15px;box-sizing:border-box;font-weight:400;-webkit-transition:.3s ease;transition:.3s ease}.form-module .checkbox{display:block;margin:0 0 20px;padding:0 10px;font-weight:300;-webkit-transition:.3s ease;transition:.3s ease}.form-module .checkbox > label{cursor:pointer}.form-module .checkbox > label > input[type=checkbox]{display:initial;width:auto;margin:0;margin-top:1px\9;line-height:normal}.form-module input:focus{border:1px solid #0084b4;color:#333}.form-module button{cursor:pointer;background:#0084b4;width:100%;border:0;padding:10px 15px;color:#fff;-webkit-transition:.3s ease;transition:.3s ease}.form-module button:hover{background:#178ab4}.form-module .cta{background:#f2f2f2;width:100%;padding:15px 40px;box-sizing:border-box;color:#666;font-size:12px;text-align:center}.form-module .cta a{color:#333;text-decoration:none}.footer{text-align:center;letter-spacing:2px}.footer span{font-size:12px}.footer span .fa{color:#0084b4}.footer span a{color:#0084b4;font-weight:600;text-decoration:none}</style>
 
 </head>
 <body>
@@ -192,24 +191,23 @@ Also  , if possible, please take time to cancel the request from your account se
 <?php } ?>
 
 <div class="module form-module">
-	<?php /** Pre-edits for the recover/change-password switch */ ?>
-	<?php //if(($_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) OR ($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI)) { ?>
-	<?php if($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) { ?>
-		<?php /*<div class="toggle"><i class="fa fa-times <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil<?php } ?>"></i>
-			<div class="tooltip"><?php if($_Oli->getUrlParam(2) != 'register') { ?>Register<?php } else { ?>Login<?php } ?></div>
-		</div>*/ ?>
-		
-		<div class="form">
-			<h2>Recover your account</h2>
-			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/recover')?>" method="post">
-				<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email address" />
-				<button type="submit">Recover</button>
-			</form>
-		</div>
-		
-		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
-	<?php } else if($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI) { ?>
-		<div class="form">
+	<?php if(($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover') OR ($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI)) { ?>
+		<?php if($_Oli->config['allow_recover']) { ?>
+			<div class="toggle">
+				<i class="fa <?php if($_Oli->getUrlParam(2) != 'change-password') { ?>fa-pencil" placeholder="fa-question<?php } else { ?>fa-question" placeholder="fa-pencil<?php } ?>"></i>
+				<div class="tooltip" placeholder="<?php if($_Oli->getUrlParam(2) != 'change-password') { ?>Recover">Change password<?php } else { ?>Change password">Recover<?php } ?></div>
+			</div>
+			
+			<div class="form" style="display: <?php if($_Oli->getUrlParam(2) == 'recover' AND !$hideRecoverUI) { ?>block<?php } else { ?>none<?php } ?>;">
+				<h2>Recover your account</h2>
+				<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/recover')?>" method="post">
+					<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email address" />
+					<button type="submit">Recover</button>
+				</form>
+			</div>
+		<?php } ?>
+	
+		<div class="form" style="display:<?php if(!$_Oli->config['allow_recover'] OR $_Oli->getUrlParam(2) == 'change-password') { ?>block<?php } else { ?>none<?php } ?>">
 			<h2>Change your pasword</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/change-password')?><?php if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))))) { ?>&activateKey=<?=urlencode($_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))?><?php } ?>" method="post">
 				<?php if($requestInfos) { ?><input type="text" name="username" value="<?=$requestInfos['username']?>" placeholder="Username" disabled /><?php } ?>
