@@ -22,11 +22,10 @@
 |*|  Stuff to do next:
 |*|  - Ban both IP and browser (cookie) of users who fails login too many times to prevent brute-force attacks.
 |*|  - Allow direct switch between the recover and the change-password form, the same way as the login/register switch.
+|*|  - Add captcha for registering.
 |*|  
 |*|  Stuff to do on Oli:
-|*|  - Add config for disabling login management feature (such as register).
 |*|  - Add support and config for login limits.
-|*|  - Add config for login duration.
 |*|  
 |*|  --- --- ---
 |*|  
@@ -223,16 +222,17 @@ Also  , if possible, please take time to cancel the request from your account se
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
 	<?php } else { ?>
 		<?php if($_Oli->config['allow_register']) { ?>
-			<div class="toggle"><i class="fa fa-times <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil<?php } ?>"></i>
-				<div class="tooltip"><?php if($_Oli->getUrlParam(2) != 'register') { ?>Register<?php } else { ?>Login<?php } ?></div>
+			<div class="toggle">
+				<i class="fa <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil" placeholder="fa-times<?php } else { ?>fa-times" placeholder="fa-pencil<?php } ?>"></i>
+				<div class="tooltip" placeholder="<?php if($_Oli->getUrlParam(2) != 'register') { ?>Login">Register<?php } else { ?>Register">Login<?php } ?></div>
 			</div>
 		<?php } ?>
 		
-		<div class="form" style="display:<?php if($_Oli->getUrlParam(2) != 'register' OR !$_Oli->config['allow_register']) { ?>block<?php } else { ?>none<?php } ?>">
+		<div class="form" style="display:<?php if(!$_Oli->config['allow_register'] OR $_Oli->getUrlParam(2) != 'register') { ?>block<?php } else { ?>none<?php } ?>">
 			<h2>Login to your account</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/')?>" method="post">
 				<?php if(!empty($_Oli->getPostVars('referer')) OR !empty($_SERVER['HTTP_REFERER'])) { ?>
-					<input type="hidden" name="referer" value="<?=!empty($_Oli->getPostVars('referer')) ? $_Oli->getPostVars('referer') : $_SERVER['HTTP_REFERER']?>" />
+					<input type="hidden" name="referer" value="<?=$_Oli->getPostVars('referer') ?: $_SERVER['HTTP_REFERER']?>" />
 				<?php } ?>
 				
 				<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
@@ -243,7 +243,7 @@ Also  , if possible, please take time to cancel the request from your account se
 		</div>
 		<?php if($_Oli->config['allow_register']) { ?>
 			<div class="form" style="display: <?php if($_Oli->getUrlParam(2) == 'register') { ?>block<?php } else { ?>none<?php } ?>;">
-				<h2>Create an account</h2>
+				<h2>Create a new account</h2>
 				<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/register')?>" method="post">
 					<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
 					<input type="password" name="password" value="<?=$_Oli->getPostVars('password')?>" placeholder="Password" />
@@ -264,7 +264,19 @@ Also  , if possible, please take time to cancel the request from your account se
 </div>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
-<script>$(".toggle").click(function(){$(this).children("i").toggleClass("fa-pencil");if($(this).children(".tooltip").text() == "Register"){$(this).children(".tooltip").text("Login");}else{$(this).children(".tooltip").text("Register");}$(".form").animate({height:"toggle","padding-top":"toggle","padding-bottom":"toggle",opacity:"toggle"},"slow")});</script>
+<script>
+$('.toggle').click(function() {
+	$(this).children('i').addClass([
+		'fa ' + $(this).children('i').attr('placeholder'),
+		$(this).children('i').removeClass('fa'),
+		$(this).children('i').attr('placeholder', $(this).children('i').attr('class')),
+		$(this).children('i').removeClass()][0]);
+	$(this).children('.tooltip').text([
+		$(this).children('.tooltip').attr('placeholder'),
+		$(this).children('.tooltip').attr('placeholder', $(this).children('.tooltip').text())][0]);
+	$('.form').animate({ height: 'toggle', 'padding-top': 'toggle', 'padding-bottom': 'toggle', opacity: 'toggle' }, 'slow');
+});
+</script>
 
 </body>
 </html>
