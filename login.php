@@ -194,7 +194,7 @@ Also  , if possible, please take time to cancel the request from your account se
 	<?php if(($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover') OR ($_Oli->getUrlParam(2) == 'change-password' AND !$hideChangePasswordUI)) { ?>
 		<?php if($_Oli->config['allow_recover']) { ?>
 			<div class="toggle">
-				<i class="fa <?php if($_Oli->getUrlParam(2) != 'change-password') { ?>fa-pencil" placeholder="fa-question<?php } else { ?>fa-question" placeholder="fa-pencil<?php } ?>"></i>
+				<i class="fa <?php if($_Oli->getUrlParam(2) != 'change-password') { ?>fa-unlock-alt" placeholder="fa-refresh<?php } else { ?>fa-refresh" placeholder="fa-unlock-alt<?php } ?>"></i>
 				<div class="tooltip" placeholder="<?php if($_Oli->getUrlParam(2) != 'change-password') { ?>Recover">Change password<?php } else { ?>Change password">Recover<?php } ?></div>
 			</div>
 			
@@ -221,7 +221,7 @@ Also  , if possible, please take time to cancel the request from your account se
 	<?php } else { ?>
 		<?php if($_Oli->config['allow_register']) { ?>
 			<div class="toggle">
-				<i class="fa <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil" placeholder="fa-times<?php } else { ?>fa-times" placeholder="fa-pencil<?php } ?>"></i>
+				<i class="fa <?php if($_Oli->getUrlParam(2) != 'register') { ?>fa-pencil" placeholder="fa-sign-in<?php } else { ?>fa-sign-in" placeholder="fa-pencil<?php } ?>"></i>
 				<div class="tooltip" placeholder="<?php if($_Oli->getUrlParam(2) != 'register') { ?>Login">Register<?php } else { ?>Register">Login<?php } ?></div>
 			</div>
 		<?php } ?>
