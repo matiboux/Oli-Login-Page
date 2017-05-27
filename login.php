@@ -58,7 +58,7 @@ $mailHeaders = 'From: Noreply ' . $_Oli->getSetting('name') . ' <noreply@' . $_O
 $mailHeaders .= 'MIME-Version: 1.0' . "\r\n";
 $mailHeaders .= 'Content-type: text/html; charset=utf-8' . "\r\n";
 
-if($_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
+if($_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
 	if($_Oli->isEmptyPostVars('newPassword')) $resultCode = 'E:Please enter the new password you want to set';
 	else if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) $resultCode = 'E:Sorry, the request you asked for does not exist';
 	else if($requestInfos['action'] != 'change-password') $resultCode = 'E:The request you triggered does not allow you to change your password';
@@ -115,8 +115,7 @@ Also  , if possible, please take time to cancel the request from your account se
 				$resultCode = 'D:An error occurred while sending the mail to you';
 			}
 		} else $resultCode = 'E:An error occurred while creating the change-password request';
-	}
-	else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
+	} else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter an username';
 		else {
 			$username = trim($_Oli->getPostVars('username'));
@@ -207,7 +206,7 @@ Also  , if possible, please take time to cancel the request from your account se
 			</div>
 		<?php } ?>
 	
-		<div class="form" style="display:<?php if(!$_Oli->config['allow_recover'] OR $_Oli->getUrlParam(2) == 'change-password') { ?>block<?php } else { ?>none<?php } ?>">
+		<div class="form" style="display:<?php if(!$_Oli->config['allow_recover'] OR $_Oli->getUrlParam(2) == 'change-password' OR $hideRecoverUI) { ?>block<?php } else { ?>none<?php } ?>">
 			<h2>Change your pasword</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/change-password')?><?php if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))))) { ?>&activateKey=<?=urlencode($_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey'))?><?php } ?>" method="post">
 				<?php if($requestInfos) { ?><input type="text" name="username" value="<?=$requestInfos['username']?>" placeholder="Username" disabled /><?php } ?>
