@@ -51,6 +51,12 @@
 |*|    SOFTWARE.
 \*/
 
+$config = array(
+	'maxUserIdAttempts' => 3,
+	'maxUserIPAttempts' => 5,
+	'maxUsernameAttempts' => 5
+);
+
 /** Login management is disabled by the current config */
 if(!$_Oli->config['user_management'] OR !$_Oli->config['allow_login']) header('Location: ' . $_Oli->getUrlParam(0));
 
@@ -133,9 +139,14 @@ Also  , if possible, please take time to cancel the request from your account se
 			}
 		}
 	} else if($_Oli->config['allow_login']) {
-		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter your username or your email';
+		$_Oli->deleteLinesMySQL('accounts_log_limits', 'action = \'login\' AND last_trigger < date_sub(now(), INTERVAL 4 HOUR)');
+		$username = trim($_Oli->getPostVars('username'));
+		
+		if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND user_id = \'' . $_Oli->getUserId() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUserIdAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – Due to too many login attempts (' . $attempts . '), your user ID has been blocked and therefore you cannot login. Please try again later.';
+		else if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND ip_address = \'' . $_Oli->getUserIP() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUserIPAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – Due to too many login attempts (' . $attempts . '), your IP address has been blocked and therefore you cannot login. Please try again later.';
+		// else if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND username = \'' . $user . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUsernameAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – This account has been blocked because too many login attempts has been made using its username';
+		else if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter your username or your email';
 		else {
-			$username = trim($_Oli->getPostVars('username'));
 			$isExistByUsername = $_Oli->isExistAccountInfos('ACCOUNTS', $username, false);
 			$isExistByEmail = $_Oli->isExistAccountInfos('ACCOUNTS', array('email' => $username), false);
 			if(!$isExistByUsername AND !$isExistByEmail) $resultCode = 'E:Sorry, no account is associated with the username or email you entered';
@@ -149,7 +160,11 @@ Also  , if possible, please take time to cancel the request from your account se
 					if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
 					else header('Location: ' . $_Oli->getUrlParam(0));
 				} else $resultCode = 'E:An error occurred while logging you in';
-			} else $resultCode = 'E:Sorry, the password you entered seems to be wrong';
+			} else {
+				$_Oli->insertLineMySQL('accounts_log_limits', array('id' => $_Oli->getLastInfoMySQL('accounts_log_limits', 'id') + 1, 'username' => $username, 'user_id' => $_Oli->getUserId(), 'ip_address' => $_Oli->getUserIP(), 'action' => 'login', 'last_trigger' => date('Y-m-d H:i:s')));
+				
+				$resultCode = 'E:Sorry, the password you entered seems to be wrong';
+			}
 		}
 	}
 }
@@ -177,6 +192,17 @@ Also  , if possible, please take time to cancel the request from your account se
 <div class="header">
 	<h1><a href="<?php echo $_Oli->getUrlParam(0); ?>"><?php echo $_Oli->getSetting('name'); ?></a></h1>
 	<span>Powered by <a href="https://github.com/OliFramework/Oli">Oli</a>, an open source PHP framework</span>
+</div>
+
+<div class="message">
+	<div class="content">
+		<b>New!</b> Anti brute-force system. <br /> <br />
+		
+		Login attempts in the last 4hrs... <br />
+		- by user id: <b><?=$_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND user_id = \'' . $_Oli->getUserId() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0?></b> (max. <?=$config['maxUserIdAttempts']?>) <br />
+		- by IP address: <b><?=$_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND ip_address = \'' . $_Oli->getUserIP() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0?></b> (max. <?=$config['maxUserIPAttempts']?>) <br />
+		<?php if(!empty($username)) { ?>- by username (<?=$user = 'Matiboux'?>): <b><?=$_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND username = \'' . $user . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0?></b> (max. <?=$config['maxUsernameAttempts']?>)<?php } ?>
+	</div>
 </div>
 
 <?php if(isset($resultCode)) { ?>
