@@ -247,6 +247,34 @@ Also  , if possible, please take time to cancel the request from your account se
 					<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
 					<input type="password" name="password" value="<?=$_Oli->getPostVars('password')?>" placeholder="Password" />
 					<input type="email" name="email" value="<?=$_Oli->getPostVars('email')?>" placeholder="Email address" />
+					
+<?php /*<?php function captcha($captcha) {
+	$width = strlen($captcha) * 10 + 200;
+	$height = 20;
+	$midHeight = $height / 2;
+	
+	$image = imagecreate($width, $height);
+	$white = imagecolorallocate($image, 255, 255, 255); 
+	$gray = imagecolorallocate($image, 128, 128, 128); 
+	$black = imagecolorallocate($image, 0, 0, 0);
+	
+	imagestring($image, 5, strlen($captcha) /2 + 100 , $midHeight - 8, $captcha, $gray); //$black);
+	imagerectangle($image, 0, 0, $width - 1, $height - 1, $gray); // La bordure
+	
+	imageline($image, 102, $midHeight, $width - 102, $midHeight, $black);
+	imageline($image, 102, mt_rand(2, $height), $width - 102, mt_rand(2, $height), $black);
+	
+	imagepng($image);
+	imagedestroy($image);
+} ?>
+<?php
+ob_start();
+captcha($keygen = $_Oli->keygen(4, true, false, true));
+$captchaImage = ob_get_contents();
+ob_end_clean(); ?>
+<img src="data:image/png;base64,<?=base64_encode($captchaImage)?>" alt="Captcha" />
+					<input type="text" name="captcha" placeholder="Captcha (wip)" disabled />*/ ?>
+					
 					<button type="submit">Register</button>
 				</form>
 			</div>
