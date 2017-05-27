@@ -1,5 +1,7 @@
 # Oli Login Page
 
+*Built for Oli BETA 1.8.0 development branch* ♪
+
 The **official login page** for [*Oli*](https://github.com/OliFramework/Oli), an open source PHP Framework.
 
 ### Start using it
