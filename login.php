@@ -145,15 +145,18 @@ Also  , if possible, please take time to cancel the request from your account se
 		if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND user_id = \'' . $_Oli->getUserId() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUserIdAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – Due to too many login attempts (' . $attempts . '), your user ID has been blocked and therefore you cannot login. Please try again later.';
 		else if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND ip_address = \'' . $_Oli->getUserIP() . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUserIPAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – Due to too many login attempts (' . $attempts . '), your IP address has been blocked and therefore you cannot login. Please try again later.';
 		// else if(($attempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM accounts_log_limits WHERE action = \'login\' AND username = \'' . $user . '\' AND last_trigger >= date_sub(now(), INTERVAL 4 HOUR)')[0]['attempts'] ?: 0) >= $config['maxUsernameAttempts']) $resultCode = 'E:<b>Anti brute-force</b> – This account has been blocked because too many login attempts has been made using its username';
+		
 		else if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter your username or your email';
+		else if($_Oli->isEmptyPostVars('password')) $resultCode = 'E:Please enter your password';
 		else {
 			$isExistByUsername = $_Oli->isExistAccountInfos('ACCOUNTS', $username, false);
 			$isExistByEmail = $_Oli->isExistAccountInfos('ACCOUNTS', array('email' => $username), false);
+			
 			if(!$isExistByUsername AND !$isExistByEmail) $resultCode = 'E:Sorry, no account is associated with the username or email you entered';
 			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) == $_Oli->translateUserRight('NEW-USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) == $_Oli->translateUserRight('NEW-USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not yet activated';
 			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) == $_Oli->translateUserRight('BANNED')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) == $_Oli->translateUserRight('BANNED'))) $resultCode = 'E:Sorry, the account associated with that username or email is banned and is not allowed to log in';
 			else if(($isExistByUsername AND $_Oli->getUserRightLevel($username, false) < $_Oli->translateUserRight('USER')) OR ($isExistByEmail AND $_Oli->getUserRightLevel(array('email' => $username), false) < $_Oli->translateUserRight('USER'))) $resultCode = 'E:Sorry, the account associated with that username or email is not allowed to log in';
-			else if($_Oli->isEmptyPostVars('password')) $resultCode = 'E:Please enter your password';
+			
 			else if($_Oli->verifyLogin($username, $_Oli->getPostVars('password'))) {
 				$loginDuration = $_Oli->getPostVars('rememberMe') ? $_Oli->config['extended_session_duration'] : $_Oli->config['default_session_duration'];
 				if($_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
@@ -162,7 +165,6 @@ Also  , if possible, please take time to cancel the request from your account se
 				} else $resultCode = 'E:An error occurred while logging you in';
 			} else {
 				$_Oli->insertLineMySQL('accounts_log_limits', array('id' => $_Oli->getLastInfoMySQL('accounts_log_limits', 'id') + 1, 'username' => $username, 'user_id' => $_Oli->getUserId(), 'ip_address' => $_Oli->getUserIP(), 'action' => 'login', 'last_trigger' => date('Y-m-d H:i:s')));
-				
 				$resultCode = 'E:Sorry, the password you entered seems to be wrong';
 			}
 		}
