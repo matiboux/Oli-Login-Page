@@ -255,7 +255,7 @@ Also  , if possible, please take time to cancel the request from your account se
 		
 		<div class="form" style="display:<?php if(!$_Oli->config['allow_register'] OR $_Oli->getUrlParam(2) != 'register') { ?>block<?php } else { ?>none<?php } ?>">
 			<h2>Login to your account</h2>
-			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/')?>" method="post">
+			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/login')?>" method="post">
 				<?php if(!empty($_Oli->getPostVars('referer')) OR !empty($_SERVER['HTTP_REFERER'])) { ?>
 					<input type="hidden" name="referer" value="<?=$_Oli->getPostVars('referer') ?: $_SERVER['HTTP_REFERER']?>" />
 				<?php } ?>
