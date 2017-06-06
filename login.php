@@ -20,7 +20,6 @@
 |*|  Changelog: refer to repository commits
 |*|  
 |*|  Stuff to do next:
-|*|  - Ban both IP and browser (cookie) of users who fails login too many times to prevent brute-force attacks.
 |*|  - Add captcha for registering.
 |*|  
 |*|  Stuff to do on Oli:
