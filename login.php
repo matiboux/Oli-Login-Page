@@ -120,6 +120,10 @@ Also  , if possible, please take time to cancel the request from your account se
 				$resultCode = 'D:An error occurred while sending the mail to you';
 			}
 		} else $resultCode = 'E:An error occurred while creating the change-password request';
+	} else if($_Oli->getUrlParam(2) == 'unlock') {
+		$username = trim($_Oli->getPostVars('username'));
+		if(empty($username)) $resultCode = 'E:Please enter your username or your email';
+		else $resultCode = 'E:An error occurred while creating the unlock request';
 	} else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter an username';
 		else {
@@ -284,6 +288,17 @@ body { background: #e9e9e9; color: #666; font-family: 'Roboto', sans-serif; font
 				<input type="text" name="activateKey" value="<?=$_Oli->getUrlParam(3) ?: $_Oli->getPostVars('activateKey')?>" placeholder="Activation key" <?php if($requestInfos) { ?>disabled<?php } ?> />
 				<input type="password" name="newPassword" value="<?=$_Oli->getPostVars('newPassword')?>" placeholder="New password" />
 				<button type="submit">Update</button>
+			</form>
+		</div>
+		
+		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
+	<?php } else if($_Oli->getUrlParam(2) == 'unlock') { ?>
+		<div class="form" style="display: block">
+			<h2>Unlock your account</h2>
+			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/unlock')?>" method="post">
+				<input type="text" name="username" value="<?=$_Oli->getPostVars('username')?>" placeholder="Username" />
+				<button type="submit">Unlock</button>
+				<p class="help-block">Introducing help blocks! Yay. Totally not inspired from Bootstrap CSS. uwu</p>
 			</form>
 		</div>
 		
