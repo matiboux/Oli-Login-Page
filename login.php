@@ -13,7 +13,7 @@
 |*|  Oli Github repository: https://github.com/OliFramework/Oli/
 |*|  
 |*|  Once the framework is properly setup and configured, just place this file in the website theme directory.
-|*|  If your website url is 'urwebs.it' and the login page is kept in 'content/theme/' as 'login.php', you should be able to open it from 'urwebs.it/login/'
+|*|  If the login page is stored in 'content/theme/' as 'login.php', you should be able to open it from '[domain.name]/login/'.
 |*|  
 |*|  --- --- ---
 |*|  
