@@ -79,6 +79,17 @@ if($_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('act
 		} else $resultCode = 'E:An error occurred while changing your password';
 	}
 }
+else if(!$_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'unlock' AND $requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3))))) {
+	if($requestInfos['action'] != 'unlock') $resultCode = 'E:The request you triggered does not allow you to unlock your account';
+	else if(time() > strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, the request you triggered has expired';
+	else {
+		/** Deletes all the account log limits and delete the request */
+		if($_Oli->deleteAccountLines('LOG_LIMITS', $requestInfos['username']) AND $_Oli->deleteAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) {
+			$hideUnlockUI = true;
+			$resultCode = 'S:Your account has been successfully unlocked!';
+		} else $resultCode = 'E:An error occurred while changing your password';
+	}
+}
 else if($_Oli->verifyAuthKey()) {
 	if($_Oli->getUrlParam(2) == 'logout') {
 		if($_Oli->logoutAccount()) $resultCode = 'S:You have been successfully disconnected';
