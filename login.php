@@ -70,13 +70,13 @@ if($_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('act
 	else if(time() > strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, the request you triggered has expired';
 	else {
 		/** Logout the user if they're logged in */
-		if(!$_Oli->verifyAuthKey()) $_Oli->logoutAccount();
+		if($_Oli->verifyAuthKey()) $_Oli->logoutAccount();
 		
-		/** Deletes all the user sessions, change the user password and deletes the request */
+		/** Deletes all the user sessions, change the user password and delete the request */
 		if($_Oli->deleteAccountLines('SESSIONS', $requestInfos['username']) AND $_Oli->updateAccountInfos('ACCOUNTS', array('password' => $_Oli->hashPassword($_Oli->getPostVars('newPassword'))), $requestInfos['username']) AND $_Oli->deleteAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getPostVars('activateKey'))))) {
 			$hideChangePasswordUI = true;
 			$resultCode = 'S:Your password has been successfully changed!';
-		} else $resultCode = 'S:An error occurred while changing your password';
+		} else $resultCode = 'E:An error occurred while changing your password';
 	}
 }
 else if($_Oli->verifyAuthKey()) {
