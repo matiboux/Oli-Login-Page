@@ -94,6 +94,8 @@ else if($_Oli->config['account_activation'] AND $_Oli->getUrlParam(2) == 'activa
 	else $resultCode = 'E:An error occurred while activating your account';
 }
 else if($_Oli->issetPostVars()) {
+	$_Oli->runQueryMySQL('DELETE FROM `' . $_Oli->translateAccountsTableCode('REQUESTS') . '` WHERE expire_date < now()');
+	
 	if($_Oli->config['allow_recover'] AND $_Oli->getUrlParam(2) == 'recover') {
 		if($_Oli->isEmptyPostVars('email')) $resultCode = 'E:Please enter your email';
 		else if(!$username = $_Oli->getAccountInfos('ACCOUNTS', 'username', array('email' => trim($_Oli->getPostVars('email'))), false)) $resultCode = 'E:Sorry, no account is associated with the email you entered';
