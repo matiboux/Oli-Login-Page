@@ -61,7 +61,7 @@ if(!$_Oli->config['user_management'] OR !$_Oli->config['allow_login']) header('L
 
 $mailHeaders = 'From: Noreply ' . $_Oli->getSetting('name') . ' <noreply@' . $_Oli->getUrlParam('domain') . '>' . "\r\n";
 $mailHeaders .= 'MIME-Version: 1.0' . "\r\n";
-$mailHeaders .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+$mailHeaders .= 'Content-type: text/html; charset=utf-8';
 
 if($_Oli->getUrlParam(2) == 'change-password' AND !empty($_Oli->getPostVars('activateKey'))) {
 	if($_Oli->isEmptyPostVars('newPassword')) $resultCode = 'E:Please enter the new password you want to set';
