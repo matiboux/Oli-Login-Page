@@ -124,8 +124,38 @@ Also, if possible, please take time to cancel the request from your account sett
 		} else $resultCode = 'E:An error occurred while creating the change-password request';
 	} else if($_Oli->getUrlParam(2) == 'unlock') {
 		$username = trim($_Oli->getPostVars('username'));
+		
 		if(empty($username)) $resultCode = 'E:Please enter your username or your email';
-		else $resultCode = 'E:An error occurred while creating the unlock request';
+		else {
+			$isExistByUsername = $_Oli->isExistAccountInfos('ACCOUNTS', $username, false);
+			$emailOwner = $_Oli->getAccountInfos('ACCOUNTS', 'username', array('email' => $username), false);
+			if(!$isExistByUsername AND $emailOwner) {
+				$email = $username;
+				$username = $emailOwner;
+			}
+			
+			if(!$isExistByUsername AND !$emailOwner) $resultCode = 'E:Sorry, no account is associated with the username or email you entered';
+			else if(($usernameAttempts = $_Oli->runQueryMySQL('SELECT COUNT(1) as attempts FROM `' . $_Oli->translateAccountsTableCode('LOG_LIMITS') . '` WHERE action = \'login\' AND username = \'' . $username . '\' AND last_trigger >= date_sub(now(), INTERVAL 1 HOUR)')[0]['attempts'] ?: 0) < 1) $resultCode = 'E:Sorry, no failed login attempts has been recorded for this account';
+			else if($requestInfos = $_Oli->getAccountLines('REQUESTS', array('username' => $username, 'action' => 'unlock')) AND time() <= strtotime($requestInfos['expire_date'])) $resultCode = 'E:Sorry, an unlock request already exists for that account, please check your mail inbox.';
+			else if($activateKey = $_Oli->createRequest($username, 'unlock')) {
+				$email = $email ?: $_Oli->getAccountInfos('ACCOUNTS', 'email', $username, false);
+				$subject = 'One more step to unlock your account';
+				/** This message will need to be reviewed in a future release */
+				$message = nl2br('Hello, ' . $username . '!
+Last step to unlock your account, click on <a href="' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) . 'unlock/' . $activateKey . '">this link</a>.
+This request will stay valid for ' . $expireDelay = $_Oli->getRequestsExpireDelay() /3600 /24 . ' ' . ($expireDelay > 1 ? 'days' : 'day') . '. Once it has expired, the link will be desactivated.
+
+Link: ' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) . '/unlock/' . $activateKey . '.');
+				
+				if(mail($email, $subject, $message, $mailHeaders)) {
+					$hideUnlockUI = true;
+					$resultCode = 'S:The request has been successfully created and a mail has been sent to you';
+				} else {
+					$_Oli->deleteAccountLines('REQUESTS', array('activate_key' => $activateKey));
+					$resultCode = 'D:An error occurred while sending the mail to you';
+				}
+			} else $resultCode = 'E:An error occurred while creating the unlock request';
+		}
 	} else if($_Oli->config['allow_register'] AND $_Oli->issetPostVars('email')) {
 		if($_Oli->isEmptyPostVars('username')) $resultCode = 'E:Please enter an username';
 		else {
