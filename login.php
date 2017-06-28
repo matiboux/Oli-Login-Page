@@ -112,7 +112,7 @@ This request will stay valid for ' . $expireDelay = $_Oli->getRequestsExpireDela
 If you can\'t open the link, just copy it in your browser: ' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) . '/change-password/' . $activateKey . '.
 
 If you didn\'t want to change your password or didn\'t ask for this request, please just ignore this mail.
-Also  , if possible, please take time to cancel the request from your account settings.');
+Also, if possible, please take time to cancel the request from your account settings.');
 			
 			if(mail($email, $subject, $message, $mailHeaders)) {
 				$hideRecoverUI = true;
