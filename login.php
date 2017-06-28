@@ -335,7 +335,7 @@ body { background: #e9e9e9; color: #666; font-family: 'Roboto', sans-serif; font
 		</div>
 		
 		<div class="cta"><a href="<?=$_Oli->getUrlParam(0) . $_Oli->getUrlParam(1)?>/">Login to your account</a></div>
-	<?php } else if($_Oli->getUrlParam(2) == 'unlock') { ?>
+	<?php } else if($_Oli->getUrlParam(2) == 'unlock' AND !$hideUnlockUI) { ?>
 		<div class="form" style="display: block">
 			<h2>Unlock your account</h2>
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/unlock')?>" method="post">
