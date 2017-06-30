@@ -341,7 +341,7 @@ body { background: #e9e9e9; color: #666; font-family: 'Roboto', sans-serif; font
 			<form action="<?=$_Oli->getUrlParam(0)?>form.php?callback=<?=urlencode($_Oli->getUrlParam(0) . $_Oli->getUrlParam(1) . '/unlock')?>" method="post">
 				<input type="text" name="username" value="<?=$_Oli->getPostVars('username') ?: $_Oli->getUrlParam(3)?>" placeholder="Username" />
 				<button type="submit">Unlock</button>
-				<p class="help-block">Introducing help blocks! Yay. Totally not inspired from Bootstrap CSS. uwu</p>
+				<?php /*<p class="help-block">Introducing help blocks! Yay. Totally not inspired from Bootstrap CSS. uwu</p>*/ ?>
 			</form>
 		</div>
 		
