@@ -205,8 +205,14 @@ Link: ' . $_Oli->getUrlParam(0)  . $_Oli->getUrlParam(1) . '/unlock/' . $activat
 			
 			else if($_Oli->verifyLogin($username, $_Oli->getPostVars('password'))) {
 				$loginDuration = $_Oli->getPostVars('rememberMe') ? $_Oli->config['extended_session_duration'] : $_Oli->config['default_session_duration'];
-				if($_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
-					if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
+				if($authKey = $_Oli->loginAccount($username, $_Oli->getPostVars('password'), $loginDuration)) {
+					if(!empty($_Oli->config['associated_websites'])) {
+					if(preg_match('/^(https?:\/\/)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)$/', $_Oli->config['associated_websites'][0], $matches)) {
+						$url = ($matches[1] ?: 'http://') . $matches[2] . (substr($matches[3], -1) == '/' ? $matches[3] : '/') . 'request.php';
+						
+						header('Location: ' . $url . '?' . http_build_query(array('action' => 'setLoginInfos', 'userID' => $_Oli->getUserID(), 'authKey' => $authKey, 'extendedDelay' => $_Oli->getPostVars('rememberMe'), 'next' => array_slice($_Oli->config['associated_websites'], 1), 'callback' => $_Oli->getPostVars('referer') ?: $_Oli->getFullUrl())));
+					}
+					} else if(!empty($_Oli->getPostVars('referer'))) header('Location: ' . $_Oli->getPostVars('referer'));
 					else header('Location: ' . $_Oli->getUrlParam(0));
 				} else $resultCode = 'E:An error occurred while logging you in';
 			} else {
