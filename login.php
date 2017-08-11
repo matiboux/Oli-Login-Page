@@ -92,11 +92,17 @@ else if(!$_Oli->issetPostVars() AND $_Oli->getUrlParam(2) == 'unlock' AND $reque
 }
 else if($_Oli->verifyAuthKey()) {
 	if($_Oli->getUrlParam(2) == 'logout') {
-		if($_Oli->logoutAccount()) $resultCode = 'S:You have been successfully disconnected';
+		if($_Oli->logoutAccount()) {
+			if(!empty($_Oli->config['associated_websites']) AND preg_match('/^(https?:\/\/)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)$/', $_Oli->config['associated_websites'][0], $matches)) {
+				$url = ($matches[1] ?: 'http://') . $matches[2] . (substr($matches[3], -1) == '/' ? $matches[3] : '/') . 'request.php';
+				header('Location: ' . $url . '?' . http_build_query(array('action' => 'removeLoginInfos', 'next' => array_slice($_Oli->config['associated_websites'], 1), 'callback' => $_Oli->getFullUrl())));
+			} else $resultCode = 'S:You have been successfully disconnected';
+		}
 		else $resultCode = 'E:An error occurred while disconnecting you';
 	} else if($_Oli->getUrlParam(2) != 'change-password') header('Location: ' . $_Oli->getUrlParam(0));	
 }
 /** At this point, the user cannot be logged in */
+else if($_Oli->getUrlParam(2) == 'logout') { $resultCode = 'I:You are disconnected'; }
 else if($_Oli->config['account_activation'] AND $_Oli->getUrlParam(2) == 'activate' AND !empty($_Oli->getUrlParam(3))) {
 	if(!$requestInfos = $_Oli->getAccountLines('REQUESTS', array('activate_key' => hash('sha512', $_Oli->getUrlParam(3))))) $resultCode = 'E:Sorry, the request you asked for does not exist';
 	else if($requestInfos['action'] != 'activate') $resultCode = 'E:The request you triggered does not allow you to activate any account';
