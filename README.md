@@ -1,3 +1,11 @@
+# Warning!
+
+THIS REPOSITORY IS OUTDATED.
+
+THE LOGIN PAGE IS NOW DIRECTLY *INTEGRATED IN [**OLI**](https://github.com/OliFramework/Oli)*
+
+---
+
 # Oli Login Page
 
 *Built for Oli BETA 1.8.0 development branch* ♪
