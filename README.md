@@ -2,7 +2,7 @@
 
 THIS REPOSITORY IS OUTDATED.
 
-THE LOGIN PAGE IS NOW DIRECTLY *INTEGRATED IN [**OLI**](https://github.com/OliFramework/Oli)*
+THE LOGIN PAGE IS NOW DIRECTLY *INTEGRATED IN [**OLI**](https://github.com/matiboux/Oli)*
 
 ---
 
@@ -10,12 +10,12 @@ THE LOGIN PAGE IS NOW DIRECTLY *INTEGRATED IN [**OLI**](https://github.com/OliFr
 
 *Built for Oli BETA 1.8.0 development branch* ♪
 
-The **official login page** for [*Oli*](https://github.com/OliFramework/Oli), an open source PHP Framework.
+The **official login page** for [*Oli*](https://github.com/matiboux/Oli), an open source PHP Framework.
 
 ### Start using it
 
 Once your config and MySQL database are setup,  
-Download the [latest *login.php*](https://github.com/OliFramework/Oli-Login-Page/releases/latest) and place it inside the "*content/theme/\**" directory.
+Download the [latest *login.php*](https://github.com/matiboux/Oli-Login-Page/releases/latest) and place it inside the "*content/theme/\**" directory.
 
 ### License
 
